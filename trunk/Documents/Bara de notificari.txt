@@ -1,0 +1,336 @@
+==============================================
+			Bara de notificari
+==============================================
+
+- Vom avea o baza de date locala unde vom gestiona:
+	- toti utilizatorii
+	- toate notificarile utilizatorilor
+	
+	[- toate template`urile standard ale notificarilor(fiecare user isi va putea selecta un template standard sau isi va putea crea propriul sau template pentru
+	o anumita notificare)]
+	
+Cum gestionam informatia:
+	- aplicatia va gestiona:
+		- o lista de utilizatori
+		- o lista cu notificarile fiecarui utilizator
+		- o lista cu template`uri standard pentru notificari - se vor retine ca array`uri intr`un fisier .php
+		- toate setarile unei notificari standard - - se vor retine ca array`uri intr`un fisier .php
+		[- liste standard cu valorile atributelor din template]
+
+Input:
+	- vom avea nevoie de unde script care poate sa faca parsing la un json in urma caruia va rezulta un cod html ce va putea fi append-at in pagina
+	- acest script il putem pune pe Amazon S3
+	[
+		- Intrebare:
+			- oare daca am retine pe amazon s3 direct si html`ul gata pentru adaugat in pagina nu ar fi mai eficient ? 
+			- sa avem de exemplu in obiectul json setari scrict despre locul in care va fi si functiona notificarea si codul html al notificarii pentru a nu mai face parsing pe
+			client(posibil ca asa dimensiunea sa fie si mai mica pentru ca html-ul este gata parsat si nu mai trebuie sa avem in .js codul html pe bucati din care este construit
+			html-ul notificarii)
+	]
+
+Scenariu:
+	- un utilizator doreste sa`si adauge o noua notificare in site
+	- se merge in pagina de creare notificare:
+		- se vor incarca toate setarile de care poate sa dispuna o notificare:
+			- setari de style:
+				- text style
+				- background style
+				- etc
+			- setari de functionalitate
+				- expand button
+				- collapse button
+				- durata de afisare
+				- animatie
+				- etc
+		- se vor incarca apoi toate template`urile standard care are au fost predefinite si se vor afisa intr-o lista de unde user-ul va putea sa`si selecteze unul din ele
+		- in momentul incarcarii template`urilor standard, se selecteaza implicit prima din lista[(prima din lista data data dupa prioritate cea mai mare - cele fara prioritate vor
+		fi pus mai la urma - aceasta sortare se va face direct din baza de date pentru a nu mai fi nevoiti sa implementam logica pe .js)]
+		- in momentul in care se selecteaza un template standard:
+			- toate valorile setarilor din pagina se vor seta in functie de setarile template`ului respectiv, mai putin cele care pot fi setate de user(ex: Mesaj, Mesaj din label, etc)
+			- se va actualiza si preview`ul notificarii:
+				- userul trebuie sa vada in timp real toate modificarile de setari pe care notificarea sa o sufera
+				- pentru a face acest lucru mai eficient, la fiecare modificare facuta, vom forma json-ul setarilor si ne vom folosi de script pentru a afisa varianta
+				modificata a notificarii:
+					- json-ul setarilor va fi format direct in .js prin preluarea valorilor din campurile de setari
+				- pentru a actualiza notificarea ne vom folosi de functia this.parseSettings(data, true) din Notification() care ne va returna html-ul notificarii
+				dupa care noi il vom putea suprascrie in pagina(PS: s-ar putea face o simulare si intr-un iframe):
+					- pentru asta putem folosi un div cu position:relative; pentru container iar in interiorul lui codul html al notificarii sa fie cu position:absolute;
+		- user-ul poate sa`si modifice setarile unui template selectat formand astfel un template custom:
+			- se va actualiza preview`ul notificarii
+		- toate controalele de setari vor avea bind`uite evenimente de change pentru ca preview`ul sa fie posibil fara ca user`ul sa mai apese un alt button pentru refresh:
+			- toate aceste evenimente vor avea ca si callback o functie generala de refresh
+			
+		- in momentul salvarii vom efectua urmatorii pasi:
+			[
+			- vom cere de pe server un hash unic care il vom asocia template`ului notificarii(ne vom asigura de pe server ca acest hash nu mai exista):
+			- pe baza valorilor setate de utilizator se va crea un json la care ii vom face upload pe amazon s3 folosind hash`ul primit de pe server
+			- daca upload-ul s-a efectuat cu succes, vom salva in baza de date notificarea cu urmatoarele date:
+				- hash-ul primit inainte dupa care s-a facut upload pe S3
+				- campurile de audit(CreatedAt, ModifiedAt - va fi setat pe null(vom stii ca aceasta notificare inca nu a fost modificata), etc)
+			]
+			
+			- vom valida ca toate setarile sa fie setate in regula, iar daca sunt erori vom ruga user`ul sa le corecteze
+			- vom forma json`ul care reprezinta setarile notificarii
+			- vom trimite printr`un ajax la server informatiile notificarii:
+				- json`ul
+				- alte informatii
+			- in interiorul unei tranzactii vom incerca sa salvam toate datele:
+				- vom cere un hash unic
+				- vom salva notificarea  cu toate datele necesare:
+					- hash
+					- campurile de audit(CreatedAt, ModifiedAt - va fi setat pe null(vom stii ca aceasta notificare inca nu a fost modificata), etc)
+				- daca salvarea:
+					- se face cu success:
+						- incercam sa salvam pe S3 obiectul json primit:
+							- vom crea un fisier
+							- vom scrie in fisier obiectul json
+							- vom salva fisierul pe S3
+						- daca reusim sa salvam pe S3 facem commit la tranzactie
+					- se face fara success:
+						- facem rollback la tranzactie si afisam un mesaj de eroare la user
+						
+		- daca totul decurge cu succes, userul va fi redirectat intr-o pagina de overview a notificarilor detinute
+		- daca apar erori, user-ul va fi notificat, iar in cazul in care doreste sa continue poate salva din nou
+			
+	- pentru ca notificarea sa apara pe site, user`ul va trebui sa copieze un cod(un script), care va fi unic pentru fiecare notificare si sa`l adauge
+	in codul site-ului. Unicitatea fiecarui cod este data de hash-ul care il contine. Acest hash identifica unic un anume json ce contine setarile pentru
+	o anume notificare:
+		- codul acesta va putea fi preluat din cadrul overview`ului de notificari al user-ului
+		- pentru a copia acesta cod vom avea un buton "Copy code" care va copia in clipboard codul pe care utilizatorul va trebui sa`l insereze in site
+	
+	- pentru fiecare notificare va trebui sa se poata face si un preview pentru ca user`ul sa poate vedea exact cum va arata site`ul lui cu notificarea:
+		- pentru aceasta vom incarca site-ul dorit de user intr-un iframe in care vom adauga noi direct scriptul care va insera notificarea in momentul in care acesta
+		va apasa pe link`ul "Preview in full". Se va deschide ori un tab nou ori un pop-up.
+		
+	- pagina de editare poate sa fie identica cu cea de adaugare:
+		- se vor incarca toate setarile disponibile pentru notificare
+		- se vor incarca toate template`urile standard si se vor afisa intr`o lista
+		- se vor incarca setarile notificarii curente din fisierul situal pe S3 cu ajutorul hash-ului:
+			- se vor seta toate setarile din pagina cu aceste valori
+			- se vor folosi aceste valori pentru a afisa preview`ul notificarii pentru user(ca la adaugare)
+		- user-ul va putea sa`si modifice aceste valori
+		- salvarea:
+			- se va face ca la adaugare, cu mentiunea ca nu mai avem nevoie de un hash nou
+			- vom forma json-ul cu setarile notificarii
+			- vom actualiza informatia de pe S3 folosind hash-ul curent
+			- daca upload-ul s-a efectuat cu succes vom actualiza in baza de date urmatoarele informatii:
+				- ModifiedAt, etc(alte informatii care ar putea tine doar de editare
+	
+Mod de functionare a incarcarii notificarii in site:
+	- userul isi copiaza codul pentru notificare in pagina sa
+	- in momentul in care pagina se incarca, scriptul se va apela, si folosindu`se de acel hash unic, se va prelua de pe Amazon S3 setarile notificarii
+	in format json si se va forma codul html al notificarii dupa care aceasta va fi adaugat in pagina.
+	
+Schita script incarcarea setari notificare:
+
+var Notification = function()
+{
+	this.initialize = function(hash)
+	{
+		getAndLoadNotification(hash, parseSettings);
+	};
+	
+	this.parseSettings = function(data, returnHTML)
+	{
+		// aceasta functie va fi folosita si in cadrul adaugarii/editarii notificarii
+		// data - va fi json-ul care contine setarile notificarile
+		// returnHTML - va fi un flag care indica daca vrem sa si returnam html-ul notificarii
+		
+		var html = '';
+	
+		if(data)
+		{
+			// se va face parsing la setari pentru a crea codul html al notificarii care mai apoi se va incarca in html-ul paginii
+			
+			if(!returnHTML)
+			{
+				// vom incarca html-ul notificarii in pagina in functie de setare
+			}
+		}
+		
+		if(returnHTML)
+		{
+			return html;
+		}
+	};
+	
+	var getAndLoadNotification = function(hash, callback)
+	{
+		var httpRequest;
+		if (window.XMLHttpRequest)
+		{
+			httpRequest = new XMLHttpRequest();
+		}
+		else if (window.ActiveXObject)
+		{
+			// for internet explorer
+			httpRequest = new ActiveXObject("Microsoft.XMLHTTP");
+		}
+
+		httpRequest.onreadystatechange = function()
+		{
+			// ne asiguram ca s-a terminat requestul - readyStat = 4
+			// ne asiguram ca s-a efectuat cu succes - status = 200
+			if (httpRequest.readyState === 4 && httpRequest.status === 200)
+			{
+				// call the callback function
+				callback.call(httpRequest.responseXML, false);
+			}
+			else
+			{
+				// am putea loga evenimenul, iar intr`o pagina sa putem vizualiza toate erorile aparute in timp - ne ajuta sa oferim servicii mai sigure si ne
+				// poate ajuta si la bug fixing si bug searching.
+			}
+		};
+		
+		// formam url-ul de unde vom prelua setarile notificarii
+		// [amazon_s3_base_url] - va fi un url de baza catre locul unde este stocat pe amazon informatia despre toate setarile notificarilor
+		// hash - va reprezenta identificatorul unic catre resursa - setarile notificarii
+		
+		url = "[amazon_s3_base_url]" + hash; // nu e o problema daca e public url-ul ? 
+		
+		httpRequest.open('GET', url);
+		httpRequest.send();
+	};
+};
+
+Cum va arata codul embeded pe care user-ul va trebui sa`l insereze in pagina sa:
+<script src="http://domain/notification.js"></script>
+<script type="text/javascript">
+	var notification = new Notification();
+	notification.initialize("[hash]");
+</script>
+
+
+Pagina de administrare:
+	- va contine o lista cu toti utilizatorii
+	- o lista cu toate notificarile
+	- fiecare lista va contine filtre pentru a face cautarea mai eficienta:
+		- filtrele sa fie situate intr`un group-box si cu un buton de cautare
+			- group-box-ul sa fie populat cu filtre in fuctie de pagina in care suntem:
+				- pentru pagina de useri sa fie populat cu filtre pentru useri
+				- pentru pagina de notificari sa fie populat cu filtre pentru notificari
+		- in momentul filtrarii, datele sa se afiseze intr-un grid sub group-box-ul de filtre
+		- filtrarea sa se intample prin AJAX
+		
+
+Exemplu parsing JSON:
+
+http://jsfiddle.net/Vq7NW/4/
+
+<html>
+<div id="divNotification"></div>
+</html>
+
+<css>
+#divNotification
+{
+    border:1px solid #dddddd;
+}
+</css>
+
+<script>
+var jsonDataSettings = {
+    "Size": {
+        "Height": "20",
+            "Width": "300"
+    },
+        "Title": {
+        "Title": "My first notification bar",
+            "TextStyle": {
+            "Font": "Verdana",
+                "Size": "11px",
+                "Style": "italic",
+                "TextAlign": "center"
+        }
+    }
+};
+
+var loadJSON = function (jsonData) {
+    if (jsonData) {
+        var styleData = '';
+        var isIE = checkIfIE();
+        //alert(isIE);
+
+        var notificationWrapper = document.createElement('div');
+
+        if (jsonData.Size) {
+            styleData = '';
+            if (jsonData.Size.Height) {
+                styleData += "height:" + jsonData.Size.Height + "px;";
+            }
+            if (jsonData.Size.Width) {
+                styleData += "width:" + jsonData.Size.Width + "px;";
+            }
+            //alert(styleData);
+            setStyleToElement(notificationWrapper, styleData, isIE);
+        }
+
+        if (jsonData.Title) {
+
+            var title = document.createElement('h2');
+            if (jsonData.Title.Title) {
+
+                title.innerHTML = jsonData.Title.Title;
+            }
+            if (jsonData.Title.TextStyle) {
+                styleData = '';
+
+                if (jsonData.Title.TextStyle.Font) {
+                    styleData += "font-family:" + jsonData.Title.TextStyle.Font + ";";
+                }
+                if (jsonData.Title.TextStyle.Size) {
+                    styleData += "font-size:" + jsonData.Title.TextStyle.Size + ";";
+                }
+                if (jsonData.Title.TextStyle.Style) {
+                    styleData += "font-style:" + jsonData.Title.TextStyle.Style + ";";
+                }
+                if (jsonData.Title.TextStyle.TextAlign) {
+                    styleData += "text-align:" + jsonData.Title.TextStyle.TextAlign + ";";
+                }
+                
+                //alert(styleData);
+                setStyleToElement(title, styleData, isIE);
+            }
+            notificationWrapper.appendChild(title);
+        }
+        
+        var notification = document.getElementById('divNotification');
+        notification.appendChild(notificationWrapper);
+    }
+};
+
+setStyleToElement = function (element, styleData, isIE) {
+    if (element && styleData) {
+        //alert(styleData);
+        if (!isIE) {
+            element.setAttribute('style', styleData);
+        } else {
+            element.style.setAttribute('cssText', styleData);
+        }
+        //alert("Style set!");
+    }
+};
+
+checkIfIE = function()
+{
+    if (navigator.appName == "Microsoft Internet Explorer")
+        // detect if IE
+        return true;
+    return false;
+};
+
+loadJSON(jsonDataSettings);
+
+</script>
+
+
+
+
+
+
+
+
+
+		
+================================================================================================
