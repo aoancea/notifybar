@@ -1,0 +1,22 @@
+.wrapper
+{
+    width: 960px;
+    margin: 0 auto;
+    border: 1px solid #dddddd;
+    padding: 10px;
+}
+
+#notification-settings-wrapper
+{
+    height: 200px;
+    border: 1px solid #dddddd;
+    padding: 20px;
+}
+
+#notification-settings-wrapper .setting
+{
+    width: 200px;
+    height: 40px;
+    float: left;
+}
+
