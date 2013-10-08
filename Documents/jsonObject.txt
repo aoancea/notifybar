@@ -1,0 +1,38 @@
+setari:
+	- notificare:
+		- border
+		
+	- mesaj:
+		 - font
+		 - style
+		 - size
+
+
+		 
+var jsonDATA = 
+{
+	"Notification":
+	{
+		"Border":
+		{
+			"Size": "1",
+			"Style": "solid",
+			"Color": "dddddd"
+		},
+		
+		"Height": "40",
+		"WIdth": "300"
+	},
+	
+	"Title":
+	{
+		"Title": "My first notification bar",
+		"TextStyle":
+		{
+			"Font": "Verdana",
+			"Size": "11px",
+			"Style": "italic",
+			"TextAlign": "center"
+        }
+	}
+}

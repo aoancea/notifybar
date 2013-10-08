@@ -1,0 +1,154 @@
+==============================================
+			Bara de notificari
+==============================================
+
+- Vom avea o baza de date locala unde vom gestiona:
+	- toti utilizatorii
+	- toate notificarile utilizatorilor
+	- toate template`urile standard ale notificarilor(fiecare user isi va putea selecta un template standard sau isi va putea crea propriul sau template pentru
+	o anumita notificare)
+	
+Cum gestionam informatia:
+	- aplicatia va gestiona:
+		- o lista de utilizatori
+		- o lista cu notificarile fiecarui utilizator
+		- o lista cu template`uri standard pentru notificari
+		- liste standard cu valorile atributelor din template - aceste valori se vor putea modifica dupa preferintele user-ului formand template`uri custom
+		- toate setarile unei notificari
+
+Input:
+	- vom avea nevoie de unde script care poate sa faca parsing la un json in urma caruia va rezulta un cod html ce va putea fi append-at in pagina
+	- acest script il putem pune pe Amazon S3
+	- Intrebare:
+		- oare daca am retine pe amazon s3 direct si html`ul gata pentru adaugat in pagina nu ar fi mai eficient ? 
+		- sa avem de exemplu in obiectul json setari scrict despre locul in care va fi si functiona notificarea si codul html al notificarii pentru a nu mai face parsing pe
+		client(posibil ca asa dimensiunea sa fie si mai mica pentru ca html-ul este gata parsat si nu mai trebuie sa avem in .js codul html pe bucati din care este construit
+		html-ul notificarii)
+	
+Scenariu:
+	- un utilizator doreste sa`si adauge o noua notificare in site
+	- se merge in pagina de creare notificare
+	- se completeaza toate setarile dorite pentru notificare
+	
+	- in timpul modificarilor setarilor se vor intampla urmatoarele faze:
+		- userul trebuie sa vada in timp real toate modificarile de setari pe care notificarea s-a o sufera
+		- pentru a face acest lucru mai eficient, la fiecare modificare facuta, vom forma json-ul setarilor si ne vom folosi de script pentru a afisa varianta
+		modificata a notificarii
+		- pentru a actualiza notificarea ne vom folosi de functia this.parseSettings(data, true) din Notification() care ne va returna html-ul notificarii
+		dupa care noi il vom putea suprascrie in pagina(PS: s-ar putea face o simulare si intr-un iframe)
+	
+	- in momentul salvarii vom efectua urmatorii pasi:
+		- pe baza valorilor setate de utilizator se va crea un json la care ii vom face upload pe amazon s3
+		- fiecare upload de json va primii un identificator unic( hash )
+		- valorile setate de utilizator + hash-ul json-ului se vor salva in baza de date la notificarea curenta
+		- in momentul salvarii setarilor in baza de date acestea vor fi salvate sub forma de template custom daca s-a modificat vreo setare de la 
+		template`ul standard(putem intercepta modificari de template direct din javascript, iar in cazul in care au aparut modificari doar trimitem un
+		parametru in care spunem ca vrem o generare de template custom) iar daca nu au aparut modificari vom putea prelua direct id-ul template-ului standard
+			- in cazul in care se vor face modificari pe template`urile standard, iar unii useri au selectat ca template de baza unul dintre aceste template`uri,
+			li se va modifica si lor aspectul notificarii:
+				- am putea trimite cate un mail de notificare fiecarui user care are selectat template`ul care tocmai s-a modificat pentru ca acesta sa fie instiintat de
+				modificarile aduse.
+				- o alta varianta ar fi sa nu preluam id-ul template`ului direct, ci sa duplicam direct fiecare setare
+		- daca totul decurge cu succes, userul va fi redirectat intr-o pagina de overview a notificarilor detinute
+	
+	- pentru ca notificarea sa apara pe site, user`ul va trebui sa copieze un cod(un script), care va fi unic pentru fiecare notificare si sa`l adauge
+	in codul site-ului. Unicitatea fiecarui cod este data de hash-ul care il contine. Acest hash identifica unic un anume json ce contine setarile pentru
+	o anume notificare.
+	
+	- pentru fiecare notificare va trebui sa se poata face si un preview pentru ca user`ul sa poate vedea exact cum va arata site`ul lui cu notificarea:
+		- pentru aceasta vom incarca site-ul intr-un iframe in care vom adauga noi direct scriptul care va insera notificarea in momentul in care acesta
+		va apasa pe link`ul "Preview in full". Se va deschide ori un tab nou ori un pop-up.
+		
+	- pagina de editare poate sa fie identica cu cea de adaugare
+	
+Mod de functionare a incarcarii notificarii in site:
+	- userul isi copiaza codul pentru notificare in pagina sa
+	- in momentul in care pagina se incarca, scriptul se va apela, si folosindu`se de acel hash unic, se va prelua de pe Amazon S3 setarile notificarii
+	in format json si se va forma codul html al notificarii dupa care aceasta va fi adaugat in pagina.
+	
+Schita script incarcarea setari notificare:
+
+var Notification = function()
+{
+	this.initialize = function(hash)
+	{
+		getAndLoadNotification(hash, parseSettings);
+	};
+	
+	this.parseSettings = function(data, returnHTML)
+	{
+		// aceasta functie va fi folosita si in cadrul adaugarii/editarii notificarii
+		// data - va fi json-ul care contine setarile notificarile
+		// returnHTML - va fi un flag care indica daca vrem sa si returnam html-ul notificarii
+		
+		var html = '';
+	
+		if(data)
+		{
+			// se va face parsing la setari pentru a crea codul html al notificarii care mai apoi se va incarca in html-ul paginii
+			
+			if(!returnHTML)
+			{
+				// vom incarca html-ul notificarii in pagina in functie de setare
+			}
+		}
+		
+		if(returnHTML)
+		{
+			return html;
+		}
+	};
+	
+	var getAndLoadNotification = function(hash, callback)
+	{
+		var httpRequest;
+		if (window.XMLHttpRequest)
+		{
+			httpRequest = new XMLHttpRequest();
+		}
+		else if (window.ActiveXObject)
+		{
+			// for internet explorer
+			httpRequest = new ActiveXObject("Microsoft.XMLHTTP");
+		}
+
+		httpRequest.onreadystatechange = function()
+		{
+			// ne asiguram ca s-a terminat requestul - readyStat = 4
+			// ne asiguram ca s-a efectuat cu succes - status = 200
+			if (httpRequest.readyState === 4 && httpRequest.status === 200)
+			{
+				// call the callback function
+				callback.call(httpRequest.responseXML, false);
+			}
+			else
+			{
+				// am putea loga evenimenul, iar intr`o pagina sa putem vizualiza toate erorile aparute in timp - ne ajuta sa oferim servicii mai sigure si ne
+				// poate ajuta si la bug fixing si bug searching.
+			}
+		};
+		
+		// formam url-ul de unde vom prelua setarile notificarii
+		// [amazon_s3_base_url] - va fi un url de baza catre locul unde este stocat pe amazon informatia despre toate setarile notificarilor
+		// hash - va reprezenta identificatorul unic catre resursa - setarile notificarii
+		
+		url = "[amazon_s3_base_url]" + hash; // nu e o problema daca e public url-ul ? 
+		
+		httpRequest.open('GET', url);
+		httpRequest.send();
+	};
+};
+
+Cum va arata embeded pe care user-ul va trebui sa`l insereze in pagina sa:
+<script src="http://domain/notification.js"></script>
+<script type="text/javascript">
+	var notification = new Notification();
+	notification.initialize("[hash]");
+</script>
+
+
+Pagina de administrare:
+	- va contine o lista cu toti utilizatorii
+	- o lista cu toate notificarile
+	- fiecare lista va contine filtre pentru a face cautarea mai eficienta
+

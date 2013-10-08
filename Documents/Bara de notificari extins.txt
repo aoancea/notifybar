@@ -1,0 +1,83 @@
+==============================================
+			Bara de notificari - extins
+==============================================
+
+Modificari:
+	- modul de salvare a datelor sa se faca direct pe amazon, sa nu se retina in baza de date informatiile setarilor notificarii - trebuie vazut atunci cum se va construi html`ul 
+	notificarii daca vom retine pe amazon toate setarile, e eficient asa? oare nu putem sa retinem si html`ul gata facut - asta ar implica o incarcare mai lunga si spatiu mai mult 
+	si un cost mai mare.
+	- in baza de date sa se pastreze doar informatiile strict necesare pentru o notificare: hash, creation date, publish date, owner, etc
+	- s-ar putea adauga si optine pentru valabilitatea notificarii; de exemplu se vrea sa apara o notificare pentru o perioada de timp dar user-ul uita sa`si scoata codul din pagina
+	- s-ar putea adauga si optiune pentru dezactivare notificare direct din panoul de administrare pentru ca user`ul sa nu trebuiasca sa umble in codul site`ului ci doar printr-un 
+	click sa rezolve problema: asta implica faptul ca in pagina sa se va incarca un cod aproximativ inutil(e alegerea lui), iar pentru noi, pentru a pastra integritatea datelor posibil 
+	ca ar trebui sa mutam informatiile pentru ca in momentul in care aceastea se doresc a fi preluate acestea sa nu existe. S-ar putea muta intr-un fisier cu numele celui precedent 
+	doar post-fixat cu litera "i" de la "Inactive"
+
+- sa nu avem gestiunea de hash pe o notificare ci pe un anume website:
+	- pe un website se poate pune o singura notificare la un moment dat, bineinteles asta in cazul in care nu apare optinea de avea mai multe notificari(top, bottom, right, left, center, etc)
+	
+	
+- in loc sa stocam informatiile despre setari si template`uri standard in baza de date, am putea sa le stocam intr`un fisier .php ca array, iar in momentul in care dorim sa incarcam in pagina toate setarile si template`urile
+vom returna direct aceste array`uri si vom folosi echo json_encode([settings])
+
+var jsonData = 
+				{
+						"Title": "Title1",
+						"TextStyle":
+						[
+						   {
+								"Font": "Font1",
+								"Size": "Size1",
+								"Style": "Style1"
+						   },
+						],
+				};
+				
+
+	if(jsonData)
+	{
+		if(jsonData.Title)
+		{
+			// set title
+		}
+		
+		if(jsonData.TextStyle)
+		{
+			var element = document.getElementById('[element_id]');
+			var styleData = '';
+		
+			if(jsonData.TextStyle.Font)
+			{
+				// set inline text font
+				styleData += jsonData.TextStyle.Font;
+			}
+			
+			if(jsonData.TextStyle.Size)
+			{
+				// set inline text size
+				styleData += jsonData.TextStyle.Size;
+			}
+			
+			if(jsonData.TextStyle.Style)
+			{
+				// set inline text style
+				styleData += jsonData.TextStyle.Style;
+			}
+			
+			var isIE = false;
+			
+			if(navigator.userAgent.indexOf('Internet Explorer'))
+			{
+				isIE = true
+			);
+			
+			if(!isIE)
+			{
+				element.setAttribute('style', styleData);
+			}
+			else
+			{
+				myObj.style.setAttribute('cssText', styleData);
+			}
+		}
+	}
