@@ -1,0 +1,7 @@
+<root>
+    <notification>
+        <name>
+            Name1
+        </name>
+    </notification>
+</root>

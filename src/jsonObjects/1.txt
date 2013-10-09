@@ -1,0 +1,28 @@
+{
+	"Notification":
+	{
+		"Size":
+		{
+			"Height": "40",
+			"Width": "200"
+		},
+		"Border":
+		{
+			"Size": "1",
+			"Style": "dashed",
+			"Color": "red"
+		}
+	},
+
+	"Title":
+	{
+		"Title": "My first notification bar",
+		"TextStyle":
+		{
+			"Font": "verdana",
+			"Size": "11",
+			"Style": "italic",
+			"TextAlign": "center"
+		}
+	}
+}
