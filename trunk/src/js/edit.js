@@ -1,34 +1,6 @@
 var Create = function()
 {
-    var jsonData =
-    {
-        "Notification":
-        {
-            "Size":
-            {
-                "Height": "40",
-                "Width": "200"
-            },
-            "Border":
-            {
-                "Size": "1",
-                "Style": "dashed",
-                "Color": "red"
-            }
-        },
-
-        "Title":
-        {
-            "Title": "My first notification bar",
-            "TextStyle":
-            {
-                "Font": "verdana",
-                "Size": "11",
-                "Style": "italic",
-                "TextAlign": "center"
-            }
-        }
-    };
+    var jsonData = null;
 
     var NotificationObject = null;
 
@@ -75,7 +47,7 @@ var Create = function()
 
     Controls.Preview = null;
 
-    Controls.btnCreateNotification = null;
+    Controls.btnUpdateNotification = null;
 
     this.initializeControls = function()
     {
@@ -87,13 +59,13 @@ var Create = function()
 
         Controls.Preview = $("#preview");
 
-        Controls.btnCreateNotification = $("#btnCreateNotification");
-        if(Controls.btnCreateNotification.length > 0)
+        Controls.btnUpdateNotification = $("#btnUpdateNotification");
+        if(Controls.btnUpdateNotification.length > 0)
         {
-            Controls.btnCreateNotification.click(function(){
+            Controls.btnUpdateNotification.click(function(){
                 $.ajax({
                     type: "POST",
-                    url: "createnotification.php",
+                    url: "updatenotification.php",
                     dataType: "json",
                     data:
                     {
@@ -102,11 +74,13 @@ var Create = function()
                     },
                     success: function(data)
                     {
+                        //alert("Success!" + "\n" + " Here is your file name: " + data);
+
                         var embeded =
                             '<script type="text/javascript"> \n' +
-                                '    var notification = new Notification();\n' +
-                                '    notification.initialize("'+ data +'");\n' +
-                                '</script>';
+                            '    var notification = new Notification();\n' +
+                            '    notification.initialize("'+ data +'");\n' +
+                            '</script>';
 
                         alert("Success!" + "\n" + " Here is your script: \n" + embeded);
                     }
@@ -127,11 +101,11 @@ var Create = function()
                 //alert("Text change!");
 
                 setTimeout(function()
-                {
-                    jsonData.Notification.Size.Height = Controls.txt_Notification_Size_Height.val();
-                    refreshNotification(jsonData)
-                },
-                500);
+                    {
+                        jsonData.Notification.Size.Height = Controls.txt_Notification_Size_Height.val();
+                        refreshNotification(jsonData)
+                    },
+                    500);
             });
         }
 
@@ -142,11 +116,11 @@ var Create = function()
                 // change event handler
                 //alert("Text change!");
                 setTimeout(function()
-                {
-                    jsonData.Notification.Size.Width = Controls.txt_Notification_Size_Width.val();
-                    refreshNotification(jsonData);
-                },
-                500);
+                    {
+                        jsonData.Notification.Size.Width = Controls.txt_Notification_Size_Width.val();
+                        refreshNotification(jsonData);
+                    },
+                    500);
             });
         }
 
@@ -362,9 +336,19 @@ var Create = function()
                             Data.Is_Title_TextStyle_TextAlign_Ready
                         )
                     {
-                        setSettingsValues(jsonData);
-                    }
+                        var url = "jsonObjects/" + Data.Hash + ".txt";
 
+                        $.ajax({
+                            type: "GET",
+                            url: url,
+                            dataType: "json",
+                            success: function(data)
+                            {
+                                jsonData = data;
+                                setSettingsValues(jsonData);
+                            }
+                        });
+                    }
                 }
             },
             error: function(xhr, status, error)
@@ -372,7 +356,7 @@ var Create = function()
                 alert("Undefined error: " + xhr.responseText);
             }
         });
-    };
+    }
 
     var setSettingsValues = function(jsonData)
     {
@@ -402,5 +386,5 @@ var Create = function()
             Controls.Preview.empty(); // we empty the container
             Controls.Preview.append(html); // we append the notification object to the container
         }
-    };
+    }
 };

@@ -13,11 +13,16 @@ var Notification = function()
 
     this.initialize = function(hash)
     {
-        getAndLoadNotification(hash, parseSettings);
+        //alert("initialize notification object");
+
+        getAndLoadNotification(hash, internalParseSettings);
     };
 
-    this.parseSettings = function(jsonData, returnHTML)
+    var internalParseSettings = function(jsonData, returnHTML)
     {
+        //alert(jsonData);
+        //alert(returnHTML);
+
         var html = null;
         if (jsonData)
         {
@@ -29,7 +34,7 @@ var Notification = function()
 
             if(jsonData.Notification)
             {
-                styleData = '';
+                styleData = 'margin:0 auto;';
 
                 if (jsonData.Notification.Size)
                 {
@@ -59,7 +64,7 @@ var Notification = function()
 
                     if (jsonData.Notification.Border.Color)
                     {
-                        borderCss += "#" + jsonData.Notification.Border.Color + ";";
+                        borderCss += jsonData.Notification.Border.Color + ";";
                     }
 
                     if(borderCss)
@@ -74,12 +79,11 @@ var Notification = function()
 
             if (jsonData.Title)
             {
-
                 var title = document.createElement('h2');
                 if (jsonData.Title.Title)
                 {
-
                     title.innerHTML = jsonData.Title.Title;
+                    //alert(jsonData.Title.Title);
                 }
 
                 if (jsonData.Title.TextStyle)
@@ -114,11 +118,30 @@ var Notification = function()
             }
 
 
+            //alert(returnHTML);
+
             if(!returnHTML)
             {
                 // vom incarca html-ul notificarii in pagina in functie de setare
                 //var notification = document.getElementById('divNotification');
                 //notification.appendChild(notificationWrapper);
+
+                //alert("Inserting now !");
+
+                //document.body.insertBefore(notificationWrapper, document.body.childNodes[0]);
+                var bodyElement = document.getElementsByTagName("body")[0];
+
+                if(bodyElement)
+                {
+                    //alert(body.length);
+                    //alert(notificationWrapper.outerHTML);
+                    //alert(bodyElement.firstChild.outerHTML);
+                    //alert(bodyElement.innerHTML);
+
+                    var  firstChild = bodyElement.childNodes[0];
+
+                    bodyElement.insertBefore(notificationWrapper, bodyElement.firstChild);
+                }
             }
             else
             {
@@ -132,11 +155,28 @@ var Notification = function()
         }
     };
 
+    this.parseSettings = function(jsonData, returnHTML)
+    {
+        //alert(returnHTML);
+
+        if(!returnHTML)
+        {
+            internalParseSettings(jsonData, returnHTML);
+        }
+        else
+        {
+            return internalParseSettings(jsonData, returnHTML);
+        }
+    };
+
     var getAndLoadNotification = function(hash, callback)
     {
+        //alert("Preparing for loading json object");
+
         var httpRequest;
         if (window.XMLHttpRequest)
         {
+            //alert("Its not IE");
             httpRequest = new XMLHttpRequest();
         }
         else if (window.ActiveXObject)
@@ -152,11 +192,17 @@ var Notification = function()
             if (httpRequest.readyState === 4 && httpRequest.status === 200)
             {
                 // call the callback function
-                callback.call(httpRequest.responseXML, false);
+                //alert("State:" + httpRequest.readyState + " Status: " + httpRequest.status + " Response: " + httpRequest.responseText);
+
+                var jsondata = eval("("+httpRequest.responseText+")");
+
+                //alert(jsondata);
+
+                callback.call(this, jsondata, false);
             }
         };
 
-        url = S3URL + hash;
+        url = "http://localhost/notificationbar/jsonObjects/" + hash + ".txt";
 
         httpRequest.open('GET', url);
         httpRequest.send();
@@ -168,5 +214,17 @@ var Notification = function()
         // detect if IE
             return true;
         return false;
+    };
+
+    var setStyleToElement = function (element, styleData, isIE) {
+        if (element && styleData) {
+            //alert(styleData);
+            if (!isIE) {
+                element.setAttribute('style', styleData);
+            } else {
+                element.style.setAttribute('cssText', styleData);
+            }
+            //alert("Style set!");
+        }
     };
 }
