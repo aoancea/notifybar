@@ -1,8 +1,10 @@
 <?php
 
     $notification_border_size = array("1", "2", "3");
-    $notification_border_style = array("Solid", "Dashed", "Dotted");
+    $notification_border_style = array("None", "Solid", "Dashed", "Dotted");
     $notification_border_color = array("Red", "Lightgreen", "Darkcyan");
+    $notification_background_color = array("None", "Red", "Lightgreen", "Darkcyan");
+
 
     $title_textstyle_font = array("Verdana", "Sans Serif", "Arial");
     $title_textstyle_size = array("10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20");
@@ -33,6 +35,13 @@
             {
                 // get the notification border color array of possible choices
                 echo json_encode($notification_border_color);
+            }
+            break;
+
+            case "notification_background_color":
+            {
+                // get the notification border color array of possible choices
+                echo json_encode($notification_background_color);
             }
             break;
 

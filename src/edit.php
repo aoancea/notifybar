@@ -18,14 +18,13 @@
         });
     </script>
 
-    <script src="http://localhost/notificationbar/js/notification.js"></script>
     <script type="text/javascript">
         var notification = new Notification();
-        notification.initialize("3fsf312");
+        notification.initialize("dasdacfasd1234123");
     </script>
 </head>
 
-<body>
+<body style="position: relative;">
     <?php
         //include the S3 class
         if (!class_exists('S3'))require_once('S3/S3.php');
@@ -52,91 +51,98 @@
         }
     ?>
 
-<div class="wrapper">
-    <input type="hidden" id="notificationHash" value="<?php echo $hash; ?>"/>
+    <img src="images/ajax-loader.gif" class="ajax-loader"/>
 
-    <h2>Notification settings</h2>
+    <div class="wrapper">
+        <input type="hidden" id="notificationHash" value="<?php echo $hash; ?>"/>
 
-    <div id="notification-settings-wrapper">
+        <h2>Notification settings</h2>
 
-        <fieldset>
-            <legend>Preview</legend>
+        <div id="notification-settings-wrapper">
 
-            <div id="preview">
+            <fieldset>
+                <legend>Preview</legend>
 
-            </div>
+                <div id="preview">
+
+                </div>
+
+                <div class="clear"></div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Notification settings</legend>
+
+                <div class="setting">
+                    <label for="txt_Notification_Size_Height">Height</label>
+                    <input type="text" id="txt_Notification_Size_Height" value=""/>
+                </div>
+
+                <div class="setting">
+                    <label for="txt_Notification_Size_Width">Width</label>
+                    <input type="text" id="txt_Notification_Size_Width" value=""/>
+                </div>
+
+                <div class="setting">
+                    <label for="ddl_Notification_Background_Color">Back color</label>
+                    <select id="ddl_Notification_Background_Color"></select>
+                </div>
+
+                <div class="setting">
+                    <label for="ddl_Notification_Border_Style">Border style</label>
+                    <select id="ddl_Notification_Border_Style"></select>
+                </div>
+
+                <div class="setting">
+                    <label for="ddl_Notification_Border_Size">Border size</label>
+                    <select id="ddl_Notification_Border_Size"></select>
+                </div>
+
+                <div class="setting">
+                    <label for="ddl_Notification_Border_Color">Border color</label>
+                    <select id="ddl_Notification_Border_Color"></select>
+                </div>
+
+            </fieldset>
 
             <div class="clear"></div>
-        </fieldset>
 
-        <fieldset>
-            <legend>Notification settings</legend>
+            <fieldset>
+                <legend>Title settings</legend>
 
-            <div class="setting">
-                <label for="txt_Notification_Size_Height">Height</label>
-                <input type="text" id="txt_Notification_Size_Height" value=""/>
-            </div>
+                <div class="setting">
+                    <label for="txt_Title_Title">Title text</label>
+                    <input type="text" id="txt_Title_Title" value=""/>
+                </div>
 
-            <div class="setting">
-                <label for="txt_Notification_Size_Width">Width</label>
-                <input type="text" id="txt_Notification_Size_Width" value=""/>
-            </div>
+                <div class="setting">
+                    <label for="ddl_Title_TextStyle_Font">Title font</label>
+                    <select id="ddl_Title_TextStyle_Font"></select>
+                </div>
 
-            <div class="setting">
-                <label for="ddl_Notification_Border_Size">Border size</label>
-                <select id="ddl_Notification_Border_Size"></select>
-            </div>
+                <div class="setting">
+                    <label for="ddl_Title_TextStyle_Size">Title size</label>
+                    <select id="ddl_Title_TextStyle_Size"></select>
+                </div>
 
-            <div class="setting">
-                <label for="ddl_Notification_Border_Style">Border style</label>
-                <select id="ddl_Notification_Border_Style"></select>
-            </div>
+                <div class="setting">
+                    <label for="ddl_Title_TextStyle_Style">Title style</label>
+                    <select id="ddl_Title_TextStyle_Style"></select>
+                </div>
 
-            <div class="setting">
-                <label for="ddl_Notification_Border_Color">Border color</label>
-                <select id="ddl_Notification_Border_Color"></select>
-            </div>
+                <div class="setting">
+                    <label for="ddl_Title_TextStyle_TextAlign">Title text align</label>
+                    <select id="ddl_Title_TextStyle_TextAlign"></select>
+                </div>
 
-        </fieldset>
+            </fieldset>
+            <div class="clear"></div>
 
-        <div class="clear"></div>
+            <input id="btnUpdateNotification" type="button" value="Update notification" style="margin: 0 auto; display: block;">
 
-        <fieldset>
-            <legend>Title settings</legend>
-
-            <div class="setting">
-                <label for="txt_Title_Title">Title text</label>
-                <input type="text" id="txt_Title_Title" value=""/>
-            </div>
-
-            <div class="setting">
-                <label for="ddl_Title_TextStyle_Font">Title font</label>
-                <select id="ddl_Title_TextStyle_Font"></select>
-            </div>
-
-            <div class="setting">
-                <label for="ddl_Title_TextStyle_Size">Title size</label>
-                <select id="ddl_Title_TextStyle_Size"></select>
-            </div>
-
-            <div class="setting">
-                <label for="ddl_Title_TextStyle_Style">Title style</label>
-                <select id="ddl_Title_TextStyle_Style"></select>
-            </div>
-
-            <div class="setting">
-                <label for="ddl_Title_TextStyle_TextAlign">Title text align</label>
-                <select id="ddl_Title_TextStyle_TextAlign"></select>
-            </div>
-
-        </fieldset>
-        <div class="clear"></div>
-
-        <input id="btnUpdateNotification" type="button" value="Update notification" style="margin: 0 auto; display: block;">
-
+            <div class="clear"></div>
+        </div>
         <div class="clear"></div>
     </div>
-    <div class="clear"></div>
-</div>
 </body>
 </html>

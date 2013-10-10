@@ -1,4 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!doctype html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
@@ -6,113 +6,29 @@
 
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 
-
-    <script type="text/javascript">
-        var loadNotification = function()
-        {
-            var bodyElement = $('#frameContainer').contents().find('body')[0];
-
-
-            /*
-            var hash = $("#notificationHash").val();
-            var url = "jsonObjects/" + hash + ".txt";
-
-            $.ajax({
-                type: "GET",
-                url: url,
-                dataType: "json",
-                success: function(data)
-                {
-                    if(data)
-                    {
-
-                        var body = $("body");
-
-                        var notificationObject = new Notification();
-                        var html = notificationObject.parseSettings(data, true); // get notification object
-
-
-                        var firstChild = body.childNodes[0];
-
-                        body.insertBefore(html, firstChild);
-
-
-                        $("#frameContainer").contents().find("#___gcse_0").click(function(e){
-                            alert(1);
-                        });
-                    }
-                }
-            });
-
-            */
-        }
-
-
-        /*
-        $(document).ready(function(){
-            $("#frameContainer").ready(function(){
-
-                //alert("Loaded!");
-                var bodyElement =  $('#frameContainer').contents().find('body')[0];
-
-                var iframeDoc = $('#frameContainer')[0].contentDocument;
-                //alert(iframeDoc);
-
-                var bodyFromFrame = iframeDoc.contents().find('body');
-                alert(bodyFromFrame);
-
-
-
-                //alert(bodyElement);
-
-                var hash = $("#notificationHash").val();
-                var url = "jsonObjects/" + hash + ".txt";
-
-                $.ajax({
-                    type: "GET",
-                    url: url,
-                    dataType: "json",
-                    success: function(data)
-                    {
-                        if(data)
-                        {
-                            //alert(data);
-                            //alert(bodyElement.html());
-
-
-                        }
-                    }
-                });
-            });
-        });
-
-        */
-
-    </script>
-
-</head>
-
-<body>
-
     <?php
-        $requestMethods = $_SERVER['REQUEST_METHOD'];
+        $hash = '';
+        $url = '';
 
-        //check whether a form was submitted
-        if($requestMethods == 'GET')
+        if(isset($_GET["hash"]) && isset($_GET['url']))
         {
-            // GET
-            $hash = '';
-            if(isset($_GET["hash"]))
-            {
-                // load notification details
-                $hash = $_GET["hash"];
-            }
+            $hash = $_GET["hash"];
+            $url = $_GET['url'];
         }
     ?>
-    <input type="hidden" id="notificationHash" value="<?php echo $hash; ?>"/>
-    <iframe id="frameContainer" name="myframe" style="width:100%; height:500px;" src="http://www.w3schools.com" onload="loadNotification()">
-    </iframe>
+
+
+    <script src="js/notification.js"></script>
+    <script type="text/javascript">
+        var notification = new Notification();
+        notification.initialize("<?php echo $hash;?>");
+    </script>
+</head>
+
+<body style="padding: 0px;">
+    <iframe id="previewFrame" name="previewFrame" scrolling="no" frameborder="0" style="width: 100%; height: 1500px; padding: 0;" src="http://<?php echo $url;?>"></iframe>
 </body>
+
 </html>
 
 

@@ -1,9 +1,10 @@
 var Create = function()
 {
+    var ajax_loader = null;
+
     var jsonData = null;
 
     var NotificationObject = null;
-
 
     var Action = {};
     Action.Notification_Size_Height = "notification_size_height";
@@ -11,6 +12,7 @@ var Create = function()
     Action.Notification_Border_Size = "notification_border_size";
     Action.Notification_Border_Style = "notification_border_style";
     Action.Notification_Border_Color = "notification_border_color";
+    Action.Notification_Background_Color = "notification_background_color";
 
     Action.Title_Title = "title_title";
     Action.Title_TextStyle_Font = "title_textstyle_font";
@@ -25,6 +27,7 @@ var Create = function()
     Data.Is_Notification_Border_Size_Ready = false;
     Data.Is_Notification_Border_Style_Ready = false;
     Data.Is_Notification_Border_Color_Ready = false;
+    Data.Is_Notification_Background_Color_Ready = false;
 
     Data.Is_Title_TextStyle_Font_Ready = false;
     Data.Is_Title_TextStyle_Size_Ready = false;
@@ -38,6 +41,7 @@ var Create = function()
     Controls.ddl_Notification_Border_Size = null;
     Controls.ddl_Notification_Border_Style = null;
     Controls.ddl_Notification_Border_Color = null;
+    Controls.ddl_Notification_Background_Color = null;
 
     Controls.txt_Title_Title = null;
     Controls.ddl_Title_TextStyle_Font = null;
@@ -51,6 +55,8 @@ var Create = function()
 
     this.initializeControls = function()
     {
+        ajax_loader = $(".ajax-loader");
+
         NotificationObject = new Notification();
         Data.Hash = $("#notificationHash").val();
 
@@ -63,6 +69,8 @@ var Create = function()
         if(Controls.btnUpdateNotification.length > 0)
         {
             Controls.btnUpdateNotification.click(function(){
+
+                ajax_loader.show();
                 $.ajax({
                     type: "POST",
                     url: "updatenotification.php",
@@ -74,6 +82,8 @@ var Create = function()
                     },
                     success: function(data)
                     {
+                        ajax_loader.hide();
+
                         //alert("Success!" + "\n" + " Here is your file name: " + data);
 
                         var embeded =
@@ -83,6 +93,10 @@ var Create = function()
                             '</script>';
 
                         alert("Success!" + "\n" + " Here is your script: \n" + embeded);
+                    },
+                    error: function(xhr, status, error)
+                    {
+                        ajax_loader.hide();
                     }
                 });
             });
@@ -166,6 +180,22 @@ var Create = function()
                 setTimeout(function()
                     {
                         jsonData.Notification.Border.Color = Controls.ddl_Notification_Border_Color.val();
+                        refreshNotification(jsonData);
+                    },
+                    100);
+            });
+        }
+
+        Controls.ddl_Notification_Background_Color = $("#ddl_Notification_Background_Color");
+        if(Controls.ddl_Notification_Background_Color.length > 0)
+        {
+            ajaxGetValues(Action.Notification_Background_Color, Controls.ddl_Notification_Background_Color);
+            Controls.ddl_Notification_Background_Color.change(function(){
+                // change event handler
+                //alert($(this).val());
+                setTimeout(function()
+                    {
+                        jsonData.Notification.Background.Color = Controls.ddl_Notification_Background_Color.val();
                         refreshNotification(jsonData);
                     },
                     100);
@@ -257,6 +287,8 @@ var Create = function()
 
     var ajaxGetValues = function(action, $element)
     {
+        ajax_loader.show();
+
         $.ajax({
             type: "GET",
             url: "settings.php",
@@ -267,6 +299,8 @@ var Create = function()
             },
             success: function(data)
             {
+                ajax_loader.hide();
+
                 if(data)
                 {
                     var k = 0;
@@ -300,6 +334,12 @@ var Create = function()
                             break;
                         }
 
+                        case Action.Notification_Background_Color:
+                        {
+                            Data.Is_Notification_Background_Color_Ready = true;
+                            break;
+                        }
+
                         case Action.Title_TextStyle_Font:
                         {
                             Data.Is_Title_TextStyle_Font_Ready = true;
@@ -330,6 +370,7 @@ var Create = function()
                             Data.Is_Notification_Border_Size_Ready &&
                             Data.Is_Notification_Border_Style_Ready &&
                             Data.Is_Notification_Border_Color_Ready &&
+                            Data.Is_Notification_Background_Color_Ready &&
                             Data.Is_Title_TextStyle_Font_Ready &&
                             Data.Is_Title_TextStyle_Size_Ready &&
                             Data.Is_Title_TextStyle_Style_Ready &&
@@ -353,6 +394,8 @@ var Create = function()
             },
             error: function(xhr, status, error)
             {
+                ajax_loader.hide();
+
                 alert("Undefined error: " + xhr.responseText);
             }
         });
@@ -367,6 +410,7 @@ var Create = function()
             Controls.ddl_Notification_Border_Size.val(jsonData.Notification.Border.Size);
             Controls.ddl_Notification_Border_Style.val(jsonData.Notification.Border.Style);
             Controls.ddl_Notification_Border_Color.val(jsonData.Notification.Border.Color);
+            Controls.ddl_Notification_Background_Color.val(jsonData.Notification.Background.Color);
 
             Controls.txt_Title_Title.val(jsonData.Title.Title);
             Controls.ddl_Title_TextStyle_Font.val(jsonData.Title.TextStyle.Font);

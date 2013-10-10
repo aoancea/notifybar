@@ -68,3 +68,15 @@ fieldset legend
     position: relative;
     height: 50px;
 }
+
+html, body { min-height: 100%; }
+
+.ajax-loader
+{
+
+    position: absolute;
+    left:50%;
+    top:50%;
+
+
+}

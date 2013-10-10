@@ -1,12 +1,3 @@
-/**
- * Created with JetBrains PhpStorm.
- * User: Proba
- * Date: 10/8/13
- * Time: 3:14 PM
- * To change this template use File | Settings | File Templates.
- */
-
-
 var Notification = function()
 {
     var S3URL = ''; // to be set
@@ -35,6 +26,14 @@ var Notification = function()
             if(jsonData.Notification)
             {
                 styleData = 'margin:0 auto;';
+
+                if(jsonData.Notification.Background)
+                {
+                    if(jsonData.Notification.Background.Color)
+                    {
+                        styleData += "background-color:" + jsonData.Notification.Background.Color + ";";
+                    }
+                }
 
                 if (jsonData.Notification.Size)
                 {
@@ -202,7 +201,7 @@ var Notification = function()
             }
         };
 
-        url = "http://localhost/notificationbar/jsonObjects/" + hash + ".txt";
+        url = "jsonObjects/" + hash + ".txt";
 
         httpRequest.open('GET', url);
         httpRequest.send();
