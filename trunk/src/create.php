@@ -19,7 +19,9 @@
     </script>
 </head>
 
-<body>
+<body style="position: relative;">
+<img src="images/ajax-loader.gif" class="ajax-loader"/>
+
     <?php
         //include the S3 class
         if (!class_exists('S3'))require_once('S3/S3.php');
@@ -84,13 +86,18 @@
                 </div>
 
                 <div class="setting">
-                    <label for="ddl_Notification_Border_Size">Border size</label>
-                    <select id="ddl_Notification_Border_Size"></select>
+                    <label for="ddl_Notification_Background_Color">Back color</label>
+                    <select id="ddl_Notification_Background_Color"></select>
                 </div>
 
                 <div class="setting">
                     <label for="ddl_Notification_Border_Style">Border style</label>
                     <select id="ddl_Notification_Border_Style"></select>
+                </div>
+
+                <div class="setting">
+                    <label for="ddl_Notification_Border_Size">Border size</label>
+                    <select id="ddl_Notification_Border_Size"></select>
                 </div>
 
                 <div class="setting">
