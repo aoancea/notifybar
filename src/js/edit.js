@@ -1,8 +1,10 @@
-var Create = function()
+var Edit = function(jsonObject)
 {
     var ajax_loader = null;
 
-    var jsonData = null;
+    //alert(jsonObject);
+
+    var jsonData = jsonObject;
 
     var NotificationObject = null;
 
@@ -87,6 +89,7 @@ var Create = function()
                         //alert("Success!" + "\n" + " Here is your file name: " + data);
 
                         var embeded =
+                            '<script src="http://jumpeyeother.s3.amazonaws.com/notifysnack/notification.js"></script>\n' +
                             '<script type="text/javascript"> \n' +
                             '    var notification = new Notification();\n' +
                             '    notification.initialize("'+ data +'");\n' +
@@ -377,18 +380,26 @@ var Create = function()
                             Data.Is_Title_TextStyle_TextAlign_Ready
                         )
                     {
-                        var url = "jsonObjects/" + Data.Hash + ".txt";
+                        //alert(jsonData);
+
+                        setSettingsValues(jsonData);
+
+                        /*
+                        var url = "http://jumpeyeother.s3.amazonaws.com/notifysnack/" + Data.Hash + ".txt";
 
                         $.ajax({
                             type: "GET",
                             url: url,
-                            dataType: "json",
+                            dataType: "jsonp",
                             success: function(data)
                             {
+                                alert(data);
+
                                 jsonData = data;
                                 setSettingsValues(jsonData);
                             }
                         });
+                        */
                     }
                 }
             },
@@ -431,4 +442,9 @@ var Create = function()
             Controls.Preview.append(html); // we append the notification object to the container
         }
     }
+
+    this.callbackJsonLoaded = function(data)
+    {
+        alert("test");
+    };
 };

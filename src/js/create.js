@@ -116,6 +116,7 @@ var Create = function()
                     {
                         ajax_loader.hide();
                         var embeded =
+                            '<script src="http://jumpeyeother.s3.amazonaws.com/notifysnack/notification.js"></script>\n' +
                             '<script type="text/javascript"> \n' +
                                 '    var notification = new Notification();\n' +
                                 '    notification.initialize("'+ data +'");\n' +
@@ -126,6 +127,7 @@ var Create = function()
                     error: function(xhr, status, error)
                     {
                         ajax_loader.hide();
+                        alert("Undefined error: " + xhr.responseText);
                     }
                 });
             });
