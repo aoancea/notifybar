@@ -3,13 +3,22 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+	<script type="text/javascript">
+		var handlejson = function(data)
+		{
+			alert("test");
+		}
+	</script>
+	<script id="notifySnack-jsonp-12345" type="text/javascript" src="http://jumpeyeother.s3.amazonaws.com/notifysnack/version1"></script>
+
     <title>Notification bar</title>
     <link rel="stylesheet" href="css/site.css">
 
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 
     <script src="js/edit.js"></script>
-    <script src="js/notification.js"></script>
+    <script src="http://jumpeyeother.s3.amazonaws.com/notifysnack/notification.js"></script>
 
     <script type="text/javascript">
         $(document).ready(function(){
@@ -18,10 +27,10 @@
         });
     </script>
 
-    <script type="text/javascript">
-        var notification = new Notification();
-        notification.initialize("dasdacfasd1234123");
-    </script>
+	<script type="text/javascript">
+		var notification = new Notification();
+		notification.initialize("123465");
+	</script>
 </head>
 
 <body style="position: relative;">
