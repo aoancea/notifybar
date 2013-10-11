@@ -23,16 +23,6 @@
 <img src="images/ajax-loader.gif" class="ajax-loader"/>
 
     <?php
-        //include the S3 class
-        if (!class_exists('S3'))require_once('S3/S3.php');
-
-        //AWS access info
-        if (!defined('awsAccessKey')) define('awsAccessKey', 'CHANGE THIS');
-        if (!defined('awsSecretKey')) define('awsSecretKey', 'CHANGE THIS TOO');
-
-        //instantiate the class
-        $s3 = new S3(awsAccessKey, awsSecretKey);
-
         $requestMethods = $_SERVER['REQUEST_METHOD'];
 
         //check whether a form was submitted

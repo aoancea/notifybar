@@ -3,7 +3,7 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-
+    <title>IFrame test page</title>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 
     <?php
@@ -18,7 +18,7 @@
     ?>
 
 
-    <script src="js/notification.js"></script>
+    <script src="http://jumpeyeother.s3.amazonaws.com/notifysnack/notification.js"></script>
     <script type="text/javascript">
         var notification = new Notification();
         notification.initialize("<?php echo $hash;?>");

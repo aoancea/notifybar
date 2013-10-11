@@ -3,12 +3,12 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Notification bar</title>
+    <title>Simple test page</title>
 
-    <script src="js/notification.js"></script>
+    <script src="http://jumpeyeother.s3.amazonaws.com/notifysnack/notification.js"></script>
     <script type="text/javascript">
         var notification = new Notification();
-        notification.initialize("1");
+        notification.initialize("2");
     </script>
 </head>
 

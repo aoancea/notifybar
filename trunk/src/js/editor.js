@@ -5,6 +5,7 @@ var Notification = function()
     this.initialize = function(hash)
     {
         //alert("initialize notification object");
+
         //getAndLoadNotification(hash, internalParseSettings);
 
         // we create a script element so we can simulate jsonp
@@ -211,7 +212,7 @@ var Notification = function()
 
         url = "jsonObjects/" + hash + ".txt";
 
-        httpRequest.open('GET', url, true); // we set true for async calling
+        httpRequest.open('GET', url, true);
         httpRequest.send();
     };
 
@@ -238,7 +239,6 @@ var Notification = function()
 
 var handlejson = function(data)
 {
-    //alert(data);
-    var parser = new Notification();
-    parser.parseSettings(data, false);
+    var page = new Edit(data);
+    page.initializeControls();
 };
