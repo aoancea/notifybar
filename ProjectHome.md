@@ -1,0 +1,1 @@
+A notification bar that can be inserted in any browser
